@@ -11,17 +11,15 @@ pub struct Reef {
 
 impl Reef {
     pub fn new() -> Self {
-        Reef {
-            prey: VecDeque::new(),
-        }
+        unimplemented!();
     }
 
     pub fn prey(&self) -> Iter<Box<dyn Prey>> {
-        self.prey.iter()
+        unimplemented!();
     }
 
     pub fn population(&self) -> usize {
-        self.prey.len()
+        unimplemented!();
     }
 
     /**
@@ -30,7 +28,7 @@ impl Reef {
      * This function takes ownership of the boxed prey.
      */
     pub fn add_prey(&mut self, prey: Box<dyn Prey>) {
-        self.prey.push_back(prey);
+        unimplemented!();
     }
 
     /**
@@ -39,6 +37,6 @@ impl Reef {
      * The callee of this function receives ownership of the boxed prey.
      */
     pub fn take_prey(&mut self) -> Option<Box<dyn Prey>> {
-        self.prey.pop_front()
+        unimplemented!();
     }
 }
