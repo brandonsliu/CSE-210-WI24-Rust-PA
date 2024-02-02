@@ -9,28 +9,47 @@ use std::rc::Rc;
 #[derive(Debug)]
 pub struct Crab {
     // TODO: Add fields here (some in part 1, some in part 2)
+    name: String,
+    speed: u32,
+    color: Color, 
+    diet: Diet,
+    reefs: Vec<Rc<RefCell<Reef>>>
 }
 
 // Do NOT implement Copy for Crab.
 impl Crab {
     pub fn new(name: String, speed: u32, color: Color, diet: Diet) -> Crab {
-        unimplemented!();
+        Crab {
+            name, 
+            speed, 
+            color, 
+            diet, 
+            reefs: Vec::new()
+        }
     }
 
     pub fn name(&self) -> &str {
-        unimplemented!();
+        &self.name
     }
 
     pub fn speed(&self) -> u32 {
-        unimplemented!();
+        self.speed
     }
 
     pub fn color(&self) -> &Color {
-        unimplemented!();
+        &self.color
     }
 
     pub fn diet(&self) -> Diet {
-        unimplemented!();
+        self.diet
+    }
+
+    pub fn breed(&self, mate: &Crab, child_name: String) -> Crab {
+        let crab_1_color = self.color();
+        let crab_2_color = mate.color();
+        let new_crab = Crab::new(child_name, 1, Color::cross(crab_1_color, crab_2_color), Diet::random_diet());
+        new_crab
+
     }
 
     // PART 2 BELOW
@@ -40,7 +59,7 @@ impl Crab {
      * Have this crab discover a new reef, adding it to its list of reefs.
      */
     pub fn discover_reef(&mut self, reef: Rc<RefCell<Reef>>) {
-        unimplemented!();
+        self.reefs.push(reef);
     }
 
     /**
@@ -53,14 +72,28 @@ impl Crab {
      * If all reefs are empty, or this crab has no reefs, return None.
      */
     fn catch_prey(&mut self) -> Option<(Box<dyn Prey>, usize)> {
-        unimplemented!();
+        let mut found_prey = None;
+        for (i, reef) in self.reefs.iter().enumerate() {
+            let mut reef_ref_cell = reef.borrow_mut();
+            let prey_option = reef_ref_cell.take_prey();
+            if let Some(prey) = prey_option {
+                found_prey = Some((prey, i));
+                return found_prey
+            }
+        }
+        found_prey
+
     }
 
     /**
      * Releases the given prey back into the reef at the given index.
      */
     fn release_prey(&mut self, prey: Box<dyn Prey>, reef_index: usize) {
-        unimplemented!();
+        let reef = &self.reefs[reef_index];
+        //let reef_rc_clone = Rc::clone(&reef);
+        //let mut reef_ref_call = reef_rc_clone.borrow_mut();
+        let mut reef_ref_call = reef.borrow_mut();
+        reef_ref_call.add_prey(prey);
     }
 
     /**
@@ -100,7 +133,37 @@ impl Crab {
      * Note: this pseudocode reads like a terrible poem.
      */
     pub fn hunt(&mut self) -> bool {
-        unimplemented!();
+        let mut escaped: Vec<Option<(Box<dyn Prey>, usize)>> = Vec::new();
+        let mut continue_catching = true;
+        while continue_catching == true {
+            let mut catch = self.catch_prey();
+            match catch {
+                Some((ref mut first, second)) => {
+                    let will_escape = first.try_escape(self);
+                    if will_escape == true {
+                        escaped.push(catch);
+                    }
+                    else if first.diet() != self.diet() {
+                        escaped.push(catch);
+                    }
+                    else {
+                        return true
+                    }
+                }
+                _ => {
+                    continue_catching = false
+                }
+            }
+        }
+        for escapee in escaped {
+            match escapee {
+                Some((mut first, second)) => {
+                    self.release_prey(first, second);
+                }
+                _ => (),
+            }
+        }
+        return false
     }
 
     /**
@@ -111,7 +174,14 @@ impl Crab {
      * up to you to figure out which ones and where. Do not make any other changes
      * to the signature.
      */
-    pub fn choose_recipe(&self, cookbook: &Cookbook) -> Option<&Recipe> {
-        unimplemented!();
+    pub fn choose_recipe<'a>(&'a self, cookbook: &'a Cookbook) -> Option<&Recipe> {
+        let mut suitable_recipe = None;
+        for recipe in cookbook.recipes() {
+            if recipe.diet() == self.diet {
+                suitable_recipe = Some(recipe);
+                return suitable_recipe;
+            }
+        }
+        suitable_recipe
     }
 }
