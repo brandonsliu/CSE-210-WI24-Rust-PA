@@ -106,13 +106,11 @@ impl Beach {
      * A crab can only belong to one clan.
      */
     pub fn add_member_to_clan(&mut self, clan_id: &str, crab_name: &str) {
-        let mut name_vec = self.clan_system.get_clan_member_names(clan_id);
-        for name in name_vec {
-            if name == crab_name {
-                return
-            }
+        //Check if crab_name already exists in clan_system
+        let already_contains = self.clan_system.clans.values().any(|l| l.contains(&crab_name.to_string()));
+        if !already_contains {
+            self.clan_system.add_clan_member(clan_id, crab_name);
         }
-        self.clan_system.add_clan_member(clan_id, crab_name);
     }
 
     /**

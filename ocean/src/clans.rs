@@ -4,7 +4,7 @@ use std::collections::HashMap;
 #[derive(Debug)]
 pub struct ClanSystem {
     // TODO: add necessary fields
-    clans: HashMap<String, Vec<String>>,
+    pub clans: HashMap<String, Vec<String>>,
 }
 
 impl ClanSystem {
@@ -65,6 +65,9 @@ impl ClanSystem {
             if vec.len() > largest {
                 largest = vec.len();
                 largest_clan_id = Some(id.clone());
+            }
+            else if vec.len() == largest {
+                largest_clan_id = None;
             }
         }
         largest_clan_id
